@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:shelf_enhanced/shelf_enhanced.dart';
 
 void main() async {
@@ -43,9 +41,9 @@ class UsersController extends Controller {
     return Json.ok(
       body: {
         'file': {
-          'filename': body['file']?['filename'] as String,
-          'mime_type': body['file']?['mime_type'] as String,
-          'size': '${((body['file']?['data'] as Uint8List).lengthInBytes / 1024 / 1024).toStringAsFixed(2)} MB',
+          'filename': (body['file'] as FileField).filename,
+          'mime_type': (body['file'] as FileField).mimeType,
+          'size': '${((body['file'] as FileField).value.lengthInBytes / 1024 / 1024).toStringAsFixed(2)} MB',
         },
       },
     );

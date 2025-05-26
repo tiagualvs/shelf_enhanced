@@ -1,11 +1,12 @@
 import 'dart:convert';
 
-import 'package:mime/mime.dart';
 import 'package:shelf/shelf.dart';
+import 'package:shelf_enhanced/src/common/field.dart';
 import 'package:shelf_multipart/shelf_multipart.dart';
 
 extension RequestExtension on Request {
-  Future<Map<String, dynamic>> readFormData() async {
+  /// Reads the body as a form data value from the context of the [Request].
+  Future<Map<String, Field>> readFormData() async {
     try {
       final contentType = headers['content-type'];
 
@@ -28,20 +29,13 @@ extension RequestExtension on Request {
       }
 
       if (formData() case var form?) {
-        final parameters = <String, dynamic>{};
+        final parameters = <String, Field>{};
 
         await for (final formData in form.formData) {
-          final filename = formData.filename;
-          final part = formData.part;
-          final headers = part.headers;
-          if (filename != null) {
-            parameters[formData.name] = {
-              'filename': filename,
-              'mime_type': headers['content-type'] ?? lookupMimeType(filename) ?? 'application/octet-stream',
-              'data': await part.readBytes(),
-            };
+          if (formData.filename != null) {
+            parameters[formData.name] = await Field.file(formData);
           } else {
-            parameters[formData.name] = await part.readString();
+            parameters[formData.name] = await Field.text(formData);
           }
         }
 
@@ -54,6 +48,7 @@ extension RequestExtension on Request {
     }
   }
 
+  /// Reads the body as a JSON value from the context of the [Request].
   Future<Map<String, dynamic>> readJson() async {
     try {
       final contentType = headers['content-type'];
@@ -80,5 +75,13 @@ extension RequestExtension on Request {
     } catch (_) {
       return {};
     }
+  }
+
+  /// Reads a value from the context of the [Request].
+  T? read<T>(String key) {
+    if (!context.containsKey(key)) return null;
+    final value = context[key];
+    if (value is! T) return null;
+    return context[key] as T;
   }
 }
