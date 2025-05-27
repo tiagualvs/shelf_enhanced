@@ -33,9 +33,9 @@ extension RequestExtension on Request {
 
         await for (final formData in form.formData) {
           if (formData.filename != null) {
-            parameters[formData.name] = await Field.file(formData);
+            parameters[formData.name] = await Field.fileFromForm(formData);
           } else {
-            parameters[formData.name] = await Field.text(formData);
+            parameters[formData.name] = await Field.textFromForm(formData);
           }
         }
 

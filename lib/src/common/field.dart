@@ -5,12 +5,14 @@ import 'package:shelf_multipart/shelf_multipart.dart';
 
 sealed class Field {
   const Field();
+  const factory Field.text(String name, String value) = TextField._;
+  const factory Field.file(String name, String filename, String mimeType, Uint8List value) = FileField._;
 
-  static Future<Field> text(FormData form) async {
+  static Future<Field> textFromForm(FormData form) async {
     return TextField._(form.name, await form.part.readString());
   }
 
-  static Future<Field> file(FormData form) async {
+  static Future<Field> fileFromForm(FormData form) async {
     return FileField._(
       form.name,
       form.filename ?? '',
