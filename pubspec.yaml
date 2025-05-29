@@ -1,6 +1,6 @@
 name: shelf_enhanced
 description: A starting point for Dart libraries or applications.
-version: 1.0.2
+version: 1.0.3
 
 environment:
   sdk: ^3.0.0

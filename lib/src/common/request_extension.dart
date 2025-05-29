@@ -77,8 +77,8 @@ extension RequestExtension on Request {
     }
   }
 
-  /// Reads a value from the context of the [Request].
-  T? read<T>(String key) {
+  /// Gets a value from the context of the [Request].
+  T? get<T>(String key) {
     if (!context.containsKey(key)) return null;
     final value = context[key];
     if (value is! T) return null;
