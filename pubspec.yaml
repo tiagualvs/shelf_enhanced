@@ -1,6 +1,6 @@
 name: shelf_enhanced
 description: A complete framework for building web applications using the shelf package.
-version: 1.0.4
+version: 1.0.5
 
 environment:
   sdk: ^3.0.0

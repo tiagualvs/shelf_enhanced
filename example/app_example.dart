@@ -103,7 +103,7 @@ class UsersController extends Controller {
     );
   }
 
-  Future<Json> findOne(Request request, String userId) async {
+  Future<Response> findOne(Request request, String userId) async {
     final index = _users.indexWhere((user) => user.id == int.parse(userId));
 
     if (index == -1) {

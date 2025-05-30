@@ -26,6 +26,30 @@ final class TextField extends Field {
   final String name;
   final String value;
   const TextField._(this.name, this.value);
+
+  int toInt() {
+    try {
+      return int.parse(value);
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  double toDouble() {
+    try {
+      return double.parse(value);
+    } catch (_) {
+      return 0.0;
+    }
+  }
+
+  bool toBool() {
+    try {
+      return bool.parse(value);
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 final class FileField extends Field {

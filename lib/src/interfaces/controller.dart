@@ -1,6 +1,7 @@
-import 'package:shelf_enhanced/shelf_enhanced.dart';
+import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import '../common/method.dart';
 import '../common/not_found_handler.dart';
 
 abstract class Controller {
@@ -13,54 +14,6 @@ abstract class Controller {
         _middlewares = [] {
     setup(Register(_router, _middlewares));
   }
-
-  // void add(String path, Method method, Function handler) {
-  //   if (!pathRegex.hasMatch(path)) {
-  //     throw ArgumentError('Invalid path');
-  //   }
-
-  //   if (!pathRegex.hasMatch(prefix)) {
-  //     throw ArgumentError('Invalid prefix');
-  //   }
-
-  //   return _router.add(method.verb, path, handler);
-  // }
-
-  // void get(String path, Function handler) {
-  //   return add(path, Get(), handler);
-  // }
-
-  // void post(String path, Function handler) {
-  //   return add(path, Post(), handler);
-  // }
-
-  // void put(String path, Function handler) {
-  //   return add(path, Put(), handler);
-  // }
-
-  // void delete(String path, Function handler) {
-  //   return add(path, Delete(), handler);
-  // }
-
-  // void patch(String path, Function handler) {
-  //   return add(path, Patch(), handler);
-  // }
-
-  // void head(String path, Function handler) {
-  //   return add(path, Head(), handler);
-  // }
-
-  // void options(String path, Function handler) {
-  //   return add(path, Options(), handler);
-  // }
-
-  // void trace(String path, Function handler) {
-  //   return add(path, Trace(), handler);
-  // }
-
-  // void middleware(Middleware middleware) {
-  //   return _middlewares.add(middleware);
-  // }
 
   void setup(Register register);
 

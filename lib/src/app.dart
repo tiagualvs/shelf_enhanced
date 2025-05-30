@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:shelf/shelf.dart' show Middleware, Pipeline;
+import 'package:shelf/shelf.dart' show Pipeline, Middleware;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_enhanced/src/common/method.dart';
 import 'package:shelf_router/shelf_router.dart';
