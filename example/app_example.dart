@@ -3,9 +3,21 @@ import 'package:shelf_enhanced/shelf_enhanced.dart';
 void main() async {
   final app = createApp(prefix: '/api/v1');
 
-  app.get('/', (_) => Response(200, body: 'Hello, World!'));
+  app.add(
+    Get(),
+    '/message/<message>',
+    (Request req, String message) => Json(200, body: {'Hello': message}),
+  );
 
-  app.controller(UsersController());
+  app.controller(
+    UsersController(),
+    middleware: (handler) {
+      return (request) {
+        print('ENTROU NO USERS CONTROLLER');
+        return handler(request);
+      };
+    },
+  );
 
   app.middleware(logRequests());
 

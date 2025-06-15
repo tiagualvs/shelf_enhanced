@@ -1,14 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:shelf/shelf.dart' show Pipeline, Middleware;
 import 'package:shelf/shelf_io.dart' as io;
-import 'package:shelf_enhanced/src/common/method.dart';
+import 'package:shelf_enhanced/shelf_enhanced.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import 'common/handler_when_has_middleware.dart';
 import 'common/not_found_handler.dart';
-import 'common/regexes.dart';
 import 'interfaces/app.dart';
-import 'interfaces/controller.dart';
 
 class AppImp implements App {
   final String? prefix;
@@ -18,7 +17,7 @@ class AppImp implements App {
   AppImp({this.prefix});
 
   @override
-  void add(Method method, String path, Function handler) {
+  void add(Method method, String path, Function handler, {Middleware? middleware}) async {
     if (!pathRegex.hasMatch(path)) {
       throw ArgumentError('Invalid path');
     }
@@ -38,51 +37,57 @@ class AppImp implements App {
       false => joinedPath,
     };
 
-    return _router.add(method.verb, normalizedPath, handler);
+    if (middleware != null) {
+      final newHandler = await handlerWhenHasMiddleware(normalizedPath, handler);
+
+      return _router.add(method.verb, normalizedPath, middleware(newHandler));
+    } else {
+      return _router.add(method.verb, normalizedPath, handler);
+    }
   }
 
   @override
-  void delete(String path, Function handler) {
-    return add(Delete(), path, handler);
+  void delete(String path, Function handler, {Middleware? middleware}) {
+    return add(Delete(), path, handler, middleware: middleware);
   }
 
   @override
-  void get(String path, Function handler) {
-    return add(Get(), path, handler);
+  void get(String path, Function handler, {Middleware? middleware}) {
+    return add(Get(), path, handler, middleware: middleware);
   }
 
   @override
-  void head(String path, Function handler) {
-    return add(Head(), path, handler);
+  void head(String path, Function handler, {Middleware? middleware}) {
+    return add(Head(), path, handler, middleware: middleware);
   }
 
   @override
-  void options(String path, Function handler) {
-    return add(Options(), path, handler);
+  void options(String path, Function handler, {Middleware? middleware}) {
+    return add(Options(), path, handler, middleware: middleware);
   }
 
   @override
-  void patch(String path, Function handler) {
-    return add(Patch(), path, handler);
+  void patch(String path, Function handler, {Middleware? middleware}) {
+    return add(Patch(), path, handler, middleware: middleware);
   }
 
   @override
-  void post(String path, Function handler) {
-    return add(Post(), path, handler);
+  void post(String path, Function handler, {Middleware? middleware}) {
+    return add(Post(), path, handler, middleware: middleware);
   }
 
   @override
-  void put(String path, Function handler) {
-    return add(Put(), path, handler);
+  void put(String path, Function handler, {Middleware? middleware}) {
+    return add(Put(), path, handler, middleware: middleware);
   }
 
   @override
-  void trace(String path, Function handler) {
-    return add(Trace(), path, handler);
+  void trace(String path, Function handler, {Middleware? middleware}) {
+    return add(Trace(), path, handler, middleware: middleware);
   }
 
   @override
-  void controller(Controller controller) {
+  void controller(Controller controller, {Middleware? middleware}) async {
     if (prefix == null) {
       return _router.mount(controller.prefix, controller.handler);
     }
@@ -98,7 +103,13 @@ class AppImp implements App {
       false => joinedPath,
     };
 
-    return _router.mount(normalizedPath, controller.handler);
+    if (middleware != null) {
+      final newHandler = await handlerWhenHasMiddleware(normalizedPath, controller.handler);
+
+      return _router.mount(normalizedPath, middleware(newHandler));
+    } else {
+      return _router.mount(normalizedPath, controller.handler);
+    }
   }
 
   @override
