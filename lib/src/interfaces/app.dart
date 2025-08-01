@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_enhanced/src/common/method.dart';
 import 'package:shelf_enhanced/src/interfaces/controller.dart';
+
+import 'exception_handler.dart';
 
 abstract interface class App {
   void add(Method method, String path, Function handler, {Middleware? middleware});
@@ -16,5 +19,6 @@ abstract interface class App {
   void trace(String path, Function handler, {Middleware? middleware});
   void controller(Controller controller, {Middleware? middleware});
   void middleware(Middleware middleware);
+  void exceptionHandler<T>(ExceptionHandler<T> handler);
   Future<HttpServer> start({Object? address, int? port});
 }

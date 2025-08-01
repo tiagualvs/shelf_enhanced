@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:shelf_enhanced/shelf_enhanced.dart';
 
 void main() async {
@@ -6,7 +8,12 @@ void main() async {
   app.add(
     Get(),
     '/message/<message>',
-    (Request req, String message) => Json(200, body: {'Hello': message}),
+    (Request req, String message) {
+      if (message == 'ABACATE') throw BadRequestException('ABACATE NAO PODE');
+      if (message == 'TREM') throw NotFoundException('TREM NAO PODE');
+      if (message == 'CURUPIRA') throw Exception('CURUPIRA NAO PODE');
+      return Json(200, body: {'Hello': message});
+    },
   );
 
   app.controller(
@@ -20,6 +27,10 @@ void main() async {
   );
 
   app.middleware(logRequests());
+
+  app.exceptionHandler<MyException>(MyExceptionHandler());
+
+  app.exceptionHandler<Exception>(DefaultExceptionHandler());
 
   final server = await app.start();
 
@@ -40,9 +51,9 @@ class UsersController extends Controller {
   }
 
   Future<Response> upload(Request request) async {
-    final body = await request.readFormData();
+    final form = await request.readFormData();
 
-    if (body.isEmpty) {
+    if (form.isEmpty()) {
       return Json.badRequest(
         body: {
           'error': 'File is required',
@@ -53,9 +64,9 @@ class UsersController extends Controller {
     return Json.ok(
       body: {
         'file': {
-          'filename': (body['file'] as FileField).filename,
-          'mime_type': (body['file'] as FileField).mimeType,
-          'size': '${((body['file'] as FileField).value.lengthInBytes / 1024 / 1024).toStringAsFixed(2)} MB',
+          'filename': form.getTextField('name')?.value,
+          'mime_type': form.getTextField('mimeType')?.value,
+          'size': '${(form.getFileField('file')?.value.lengthInBytes ?? 0 / 1024 / 1024).toStringAsFixed(2)} MB',
         },
       },
     );
@@ -143,4 +154,35 @@ class User {
   final int age;
 
   const User({required this.id, required this.name, required this.age});
+}
+
+abstract class MyException implements Exception {
+  final int statusCode;
+  final String error;
+
+  const MyException(this.statusCode, this.error);
+
+  Response toResponse() => Json(statusCode, body: {'error': error});
+}
+
+class BadRequestException extends MyException {
+  const BadRequestException(String error) : super(400, error);
+}
+
+class NotFoundException extends MyException {
+  const NotFoundException(String error) : super(404, error);
+}
+
+class MyExceptionHandler extends ExceptionHandler<MyException> {
+  @override
+  FutureOr<Response> handler(MyException exception) {
+    return exception.toResponse();
+  }
+}
+
+class DefaultExceptionHandler extends ExceptionHandler<Exception> {
+  @override
+  FutureOr<Response> handler(Exception exception) {
+    return Json.internalServerError(body: {'error': exception.toString()});
+  }
 }

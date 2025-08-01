@@ -25,7 +25,7 @@ class Json extends Response {
       },
       headers: {
         'Content-Type': 'application/json',
-        'x-powered-by': 'https://github.com/tihrasguinho/shelf_enhanced.git',
+        'x-powered-by': 'https://github.com/tiagualvs/shelf_enhanced.git',
         ...?headers,
       },
       context: context,

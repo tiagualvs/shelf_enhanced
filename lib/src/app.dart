@@ -12,6 +12,7 @@ import 'interfaces/app.dart';
 class AppImp implements App {
   final String? prefix;
   final Router _router = Router(notFoundHandler: notFoundHandler());
+  final List<ExceptionHandler> _exceptions = [];
   final List<Middleware> _middlewares = [];
 
   AppImp({this.prefix});
@@ -118,10 +119,32 @@ class AppImp implements App {
   }
 
   @override
+  void exceptionHandler<T>(ExceptionHandler<T> handler) {
+    return _exceptions.add(handler);
+  }
+
+  @override
   Future<HttpServer> start({Object? address, int? port}) async {
     final pipeline = _middlewares.fold(Pipeline(), (p, m) => p.addMiddleware(m));
 
-    final handler = pipeline.addHandler(_router.call);
+    final handler = pipeline.addHandler(
+      (request) async {
+        try {
+          return await _router.call(request);
+        } on Exception catch (e) {
+          for (final eh in _exceptions) {
+            if (eh.isException(e)) {
+              return eh.handler(e);
+            }
+          }
+          return Json.internalServerError(
+            body: {
+              'error': e.toString(),
+            },
+          );
+        }
+      },
+    );
 
     return await io.serve(handler.call, address ?? '0.0.0.0', port ?? 8080);
   }

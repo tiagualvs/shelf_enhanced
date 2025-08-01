@@ -4,7 +4,8 @@ import 'package:mime/mime.dart';
 import 'package:shelf_multipart/shelf_multipart.dart';
 
 sealed class Field {
-  const Field();
+  final String name;
+  const Field(this.name);
   const factory Field.text(String name, String value) = TextField._;
   const factory Field.file(String name, String filename, String mimeType, Uint8List value) = FileField._;
 
@@ -23,9 +24,8 @@ sealed class Field {
 }
 
 final class TextField extends Field {
-  final String name;
   final String value;
-  const TextField._(this.name, this.value);
+  const TextField._(super.name, this.value);
 
   int toInt() {
     try {
@@ -53,9 +53,8 @@ final class TextField extends Field {
 }
 
 final class FileField extends Field {
-  final String name;
   final String filename;
   final String mimeType;
   final Uint8List value;
-  const FileField._(this.name, this.filename, this.mimeType, this.value);
+  const FileField._(super.name, this.filename, this.mimeType, this.value);
 }

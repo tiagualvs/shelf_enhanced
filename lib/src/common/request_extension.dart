@@ -2,49 +2,51 @@ import 'dart:convert';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_enhanced/src/common/field.dart';
-import 'package:shelf_multipart/shelf_multipart.dart';
+import 'package:shelf_multipart/shelf_multipart.dart' hide FormData;
+
+import 'form.dart';
 
 extension RequestExtension on Request {
   /// Reads the body as a form data value from the context of the [Request].
-  Future<Map<String, Field>> readFormData() async {
+  Future<FormData> readFormData() async {
     try {
       final contentType = headers['content-type'];
 
       final contetnLength = headers['content-length'];
 
       if (contetnLength == null) {
-        return {};
+        return FormData.empty();
       }
 
       if (int.tryParse(contetnLength) == null) {
-        return {};
+        return FormData.empty();
       }
 
       if (int.parse(contetnLength) == 0) {
-        return {};
+        return FormData.empty();
       }
 
       if (contentType == null || !contentType.contains('multipart/form-data')) {
-        return {};
+        return FormData.empty();
       }
 
       if (formData() case var form?) {
-        final parameters = <String, Field>{};
+        final fields = <Field>[];
 
         await for (final formData in form.formData) {
           if (formData.filename != null) {
-            parameters[formData.name] = await Field.fileFromForm(formData);
+            fields.add(await Field.fileFromForm(formData));
           } else {
-            parameters[formData.name] = await Field.textFromForm(formData);
+            fields.add(await Field.textFromForm(formData));
           }
         }
 
-        return parameters;
+        return FormData(int.parse(contetnLength), fields);
       } else {
-        return {};
+        return FormData.empty();
       }
     } catch (_) {
-      return {};
+      return FormData.empty();
     }
   }
 
@@ -75,6 +77,11 @@ extension RequestExtension on Request {
     } catch (_) {
       return {};
     }
+  }
+
+  /// Sets a value to the context of the [Request] and returns a copy of [Request].
+  Request set<T>(String key, T value) {
+    return change(context: {key: value});
   }
 
   /// Gets a value from the context of the [Request].
