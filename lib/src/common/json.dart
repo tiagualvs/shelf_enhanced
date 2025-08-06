@@ -13,15 +13,16 @@ class Json extends Response {
 
   factory Json(
     int statusCode, {
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
     return Json._(
       statusCode,
-      body: switch (body != null) {
-        true => json.encode(body),
-        false => null,
+      body: switch (body) {
+        List<dynamic> l => json.encode(l),
+        Map<String, dynamic> m => json.encode(m),
+        _ => null,
       },
       headers: {
         'Content-Type': 'application/json',
@@ -34,7 +35,7 @@ class Json extends Response {
   }
 
   factory Json.ok({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -42,7 +43,7 @@ class Json extends Response {
   }
 
   factory Json.created({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -50,7 +51,7 @@ class Json extends Response {
   }
 
   factory Json.noContent({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -58,7 +59,7 @@ class Json extends Response {
   }
 
   factory Json.badRequest({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -66,7 +67,7 @@ class Json extends Response {
   }
 
   factory Json.unauthorized({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -74,7 +75,7 @@ class Json extends Response {
   }
 
   factory Json.forbidden({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -82,7 +83,7 @@ class Json extends Response {
   }
 
   factory Json.notFound({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -90,7 +91,7 @@ class Json extends Response {
   }
 
   factory Json.methodNotAllowed({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -98,7 +99,7 @@ class Json extends Response {
   }
 
   factory Json.conflict({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -106,7 +107,7 @@ class Json extends Response {
   }
 
   factory Json.internalServerError({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {
@@ -114,7 +115,7 @@ class Json extends Response {
   }
 
   factory Json.serviceUnavailable({
-    Map<String, dynamic>? body,
+    Object? body,
     Map<String, String>? headers,
     Map<String, Object>? context,
   }) {

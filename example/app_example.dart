@@ -16,15 +16,7 @@ void main() async {
     },
   );
 
-  app.controller(
-    UsersController(),
-    middleware: (handler) {
-      return (request) {
-        print('ENTROU NO USERS CONTROLLER');
-        return handler(request);
-      };
-    },
-  );
+  app.controller(UsersController());
 
   app.middleware(logRequests());
 
@@ -62,13 +54,13 @@ class UsersController extends Controller {
     }
 
     return Json.ok(
-      body: {
-        'file': {
-          'filename': form.getTextField('name')?.value,
-          'mime_type': form.getTextField('mimeType')?.value,
-          'size': '${(form.getFileField('file')?.value.lengthInBytes ?? 0 / 1024 / 1024).toStringAsFixed(2)} MB',
-        },
-      },
+      body: form.fields.map((f) {
+        return switch (f) {
+          TextField f => f.toString(),
+          FileField f => f.toString(),
+          ListField l => l.toString(),
+        };
+      }).toList(),
     );
   }
 
