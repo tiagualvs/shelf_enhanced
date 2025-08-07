@@ -36,38 +36,39 @@ extension RequestExtension on Request {
         await for (final formData in form.formData) {
           final match = RegExp(r'^(\w+)(?:\[(\d+)\])?$').firstMatch(formData.name);
           final name = match?.group(1) ?? formData.name;
-          final isArray = match?.group(2) != null;
+          final isList = match?.group(2) != null;
+
           if (formData.filename != null) {
-            if (isArray) {
+            if (isList) {
               final index = fields.indexWhere((f) => f.name == name);
 
               if (index == -1) {
-                fields.add(Field.list(name, [await Field.fileFromForm(formData)]));
+                fields.add(ListField(name, [await FieldValue.fileFromForm(formData)]));
               } else {
-                fields[index] = switch (fields[index]) {
-                  TextField t => Field.list(name, [t, await Field.fileFromForm(formData)]),
-                  FileField f => Field.list(name, [f, await Field.fileFromForm(formData)]),
-                  ListField l => Field.list(name, [...l.value, await Field.fileFromForm(formData)]),
+                fields[index] = switch (fields[index] is ListField) {
+                  true =>
+                    ListField(name, [...(fields[index] as ListField).value, await FieldValue.fileFromForm(formData)]),
+                  false => ListField(name, [await FieldValue.fileFromForm(formData)]),
                 };
               }
             } else {
-              fields.add(await Field.fileFromForm(formData));
+              fields.add(SimpleField(name, await FieldValue.fileFromForm(formData)));
             }
           } else {
-            if (isArray) {
+            if (isList) {
               final index = fields.indexWhere((f) => f.name == name);
 
               if (index == -1) {
-                fields.add(Field.list(name, [await Field.textFromForm(formData)]));
+                fields.add(ListField(name, [await FieldValue.textFromForm(formData)]));
               } else {
-                fields[index] = switch (fields[index]) {
-                  TextField t => Field.list(name, [t, await Field.textFromForm(formData)]),
-                  FileField f => Field.list(name, [f, await Field.textFromForm(formData)]),
-                  ListField l => Field.list(name, [...l.value, await Field.textFromForm(formData)]),
+                fields[index] = switch (fields[index] is ListField) {
+                  true =>
+                    ListField(name, [...(fields[index] as ListField).value, await FieldValue.textFromForm(formData)]),
+                  false => ListField(name, [await FieldValue.textFromForm(formData)]),
                 };
               }
             } else {
-              fields.add(await Field.textFromForm(formData));
+              fields.add(SimpleField(name, await FieldValue.textFromForm(formData)));
             }
           }
         }

@@ -1,7 +1,7 @@
 name: shelf_enhanced
 description: A complete framework for building web applications using the shelf package.
 repository: https://gitbhub.com/tiagualvs/shelf_enhanced.git
-version: 1.0.8
+version: 1.0.8+1
 
 environment:
   sdk: ^3.0.0

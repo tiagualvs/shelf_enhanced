@@ -54,13 +54,7 @@ class UsersController extends Controller {
     }
 
     return Json.ok(
-      body: form.fields.map((f) {
-        return switch (f) {
-          TextField f => f.toString(),
-          FileField f => f.toString(),
-          ListField l => l.toString(),
-        };
-      }).toList(),
+      body: form.toJson(),
     );
   }
 

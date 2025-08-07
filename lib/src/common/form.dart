@@ -16,12 +16,15 @@ class FormData {
     return fields.whereType<T>().any((f) => f.name == name);
   }
 
-  TextField? getTextField(String name) => get<TextField>(name);
-
-  FileField? getFileField(String name) => get<FileField>(name);
-
   T? get<T extends Field>(String name) {
     if (!contains<T>(name)) return null;
     return fields.whereType<T>().firstWhere((f) => f.name == name);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'contentLength': contentLength,
+      'fields': fields.map((f) => f.toJson()).toList(),
+    };
   }
 }
