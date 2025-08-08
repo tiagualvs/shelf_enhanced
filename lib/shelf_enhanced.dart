@@ -8,6 +8,7 @@ export 'package:shelf_proxy/shelf_proxy.dart';
 
 export 'src/app.dart';
 export 'src/common/field.dart';
+export 'src/common/form.dart';
 export 'src/common/json.dart';
 export 'src/common/method.dart';
 export 'src/common/regexes.dart';
